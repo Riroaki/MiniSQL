@@ -21,14 +21,16 @@ private:
 	//检查某一个属性值是否与catalog中的记录的属性类型相吻合。该函数被judgeAttribute函数调用。
 	bool checkType(string value, string type);
 
-	string getFilePath(string tableName)
-	{
-		string path = "db\\";
-		path = path + tableName;
-		path = path + "_attr.db";
-		return path;
-	}
+	
 public:
+    string getFilePath(string tableName)
+    {
+        string path = "db\\";
+        path = path + tableName;
+        path = path + "_attr.db";
+        return path;
+    }
+    
 	//给出表名，检查该表是否存在
 	bool checkFile(string File) 
 	{

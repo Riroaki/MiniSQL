@@ -52,7 +52,7 @@ bool API::select(string tableName, vector<Condition> conditionVec)
 {
 	vector<Condition> *conditionVector = &conditionVec;
 	if (conditionVec.size() > 1) { //多查找条件
-		int suc = rm.recordAllShow(tableName, conditionVector);
+		int suc = rm.recordAllShow(cm.getFilePath(tableName), conditionVector);
 		if (suc != -1) {
 			return true;
 		}
@@ -65,7 +65,7 @@ bool API::select(string tableName, vector<Condition> conditionVec)
 		vector<string> attributeName = cm.getAttributeName(tableName);//获得表的所有属性
 		string indexName = cm.getIndexName(tableName, attributeName[i]);
 		if (indexName == "") { //单查找条件没有索引的情况
-			int suc = rm.recordAllShow(tableName, conditionVector);
+			int suc = rm.recordAllShow(cm.getFilePath(tableName), conditionVector);
 			if (suc != -1) {
 				return true;
 			}
@@ -76,7 +76,7 @@ bool API::select(string tableName, vector<Condition> conditionVec)
 		else { //单查找条件有索引的情况
 			int KeyType = getKeyType((cm.getAttributeScheme(tableName))[conditionVec[0].attributeIndex]);
 			int offSet = im.SearchInIndex(indexName, conditionVec[0].cmpValue, KeyType);
-			int suc = rm.recordBlockShow(tableName, conditionVector, offSet);
+			int suc = rm.recordBlockShow(cm.getFilePath(tableName), conditionVector, offSet);
 			if (suc != -1) {
 				return true;
 			}
@@ -86,7 +86,7 @@ bool API::select(string tableName, vector<Condition> conditionVec)
 		}
 	}
 	else { //无查找条件
-		int suc = rm.recordAllShow(tableName, conditionVector);
+		int suc = rm.recordAllShow(cm.getFilePath(tableName), conditionVector);
 		if (suc != -1) {
 			return true;
 		}
@@ -99,7 +99,7 @@ bool API::select(string tableName, vector<Condition> conditionVec)
 bool API::insert(string tableName, vector<string> valueVec)
 {
 	vector<string>* record = &valueVec;
-	int offSet = rm.recordInsert(tableName, record);
+	int offSet = rm.recordInsert(cm.getFilePath(tableName), record);
 	if (offSet == -1) {
 		return false;
 	}
@@ -108,7 +108,7 @@ bool API::insert(string tableName, vector<string> valueVec)
 		string indexName = cm.getIndexName(tableName, attributeName[i]);
 		if (indexName != "") { //表示该属性有索引
 			int keyType = getKeyType((cm.getAttributeScheme(tableName))[i]);
-			bool suc = im.InsertIntoIndex(indexName, valueVec[i], keyType, offSet); //给有索引的属性对应的索引进行更改
+			bool suc = im.InsertIntoIndex(indexName+"_index.db", valueVec[i], keyType, offSet); //给有索引的属性对应的索引进行更改
 			if (!suc) {
 				return false;
 			}
@@ -122,7 +122,7 @@ int API::delete_(string tableName, vector<Condition> conditionVec)
 	vector<Condition> *conditionVector;
 	(*conditionVector) = conditionVec;
 	if (conditionVec.size() > 1) { //多查找条件
-		int suc = rm.recordAllDelete(tableName, conditionVector);
+		int suc = rm.recordAllDelete(cm.getFilePath(tableName), conditionVector);
 		if (suc != -1) {
 			return true;
 		}
@@ -135,7 +135,7 @@ int API::delete_(string tableName, vector<Condition> conditionVec)
 		vector<string> attributeName = cm.getAttributeName(tableName);//获得表的所有属性
 		string indexName = cm.getIndexName(tableName, attributeName[i]);
 		if (indexName == "") { //单查找条件没有索引的情况
-			int suc = rm.recordAllDelete(tableName, conditionVector);
+			int suc = rm.recordAllDelete(cm.getFilePath(tableName), conditionVector);
 			if (suc != -1) {
 				return true;
 			}
@@ -145,9 +145,9 @@ int API::delete_(string tableName, vector<Condition> conditionVec)
 		}
 		else { //单查找条件有索引的情况
 			int KeyType = getKeyType((cm.getAttributeScheme(tableName))[conditionVec[0].attributeIndex]);
-			int offSet = im.SearchInIndex(indexName, conditionVec[0].cmpValue, KeyType);
-			int suc = rm.recordBlockDelete(tableName, conditionVector, offSet);
-			bool succ = im.DeleteFromIndex(indexName, conditionVec[0].cmpValue, KeyType);
+			int offSet = im.SearchInIndex(indexName+"_index.db", conditionVec[0].cmpValue, KeyType);
+			int suc = rm.recordBlockDelete(cm.getFilePath(tableName), conditionVector, offSet);
+			bool succ = im.DeleteFromIndex(indexName+"_index.db", conditionVec[0].cmpValue, KeyType);
 			if (suc != -1 && succ == true) {
 				return true;
 			}
@@ -157,7 +157,7 @@ int API::delete_(string tableName, vector<Condition> conditionVec)
 		}
 	}
 	else { //无查找条件
-		int suc = rm.recordAllShow(tableName, conditionVector);
+		int suc = rm.recordAllShow(cm.getFilePath(tableName), conditionVector);
 		if (suc != -1) {
 			return true;
 		}
@@ -198,8 +198,8 @@ bool API::createIndex(string tableName, string attributeName, string indexName)
 		string sub = attributeType.substr(4);
 		keySize = stof(sub);
 	}
-	bool suc = im.CreateIndex(indexName, keySize, keyType); //在indexManager中创建B+树
-	bool succ = cm.createIndex(tableName, attributeName, indexName); //在catalogManager中记录相关信息
+    bool succ = cm.createIndex(tableName, attributeName, indexName); //在catalogManager中记录相关信息
+	bool suc = im.CreateIndex(indexName+"_index.db", keySize, keyType); //在indexManager中创建B+树
 	return suc && succ;
 }
 

@@ -37,7 +37,7 @@ bool CatalogManager::checkType(string value, string type)
 			}
 		}
 		else {
-			if (value[0] != '\"' || value[value.length() - 1] != '\"') {
+			if (value[0] != '\'' || value[value.length() - 1] != '\'') {
 				return false;
 			}
 			string str_length = type.substr(4);
@@ -280,6 +280,10 @@ bool CatalogManager::createIndex(string tableName, string attributeName, string 
 		cout << "No such a table!" << endl;
 		return false;
 	}
+    path = indexName+"_index.db";
+	ofstream index;
+	index.open(path);
+    catalog.close();
 	int i = getAttributePosition(tableName, attributeName);
 
 	catalog.open(path, ios::in | ios::out);
@@ -288,7 +292,7 @@ bool CatalogManager::createIndex(string tableName, string attributeName, string 
 	catalog << "1";
 	catalog.close();
 	
-	ofstream index;
+	//ofstream index;
 	path = "db\\index.db";
 	if (!this->checkFile(path)) {
 		index.open(path.c_str());

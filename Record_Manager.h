@@ -9,17 +9,14 @@
 
 using namespace std;
 
+extern Buffer* global_buffer;
+
 class RecordManager{
     public:
         RecordManager(){}
-        Buffer bm;
-        //API *api;
 
 		int tableCreate(string tableName);
         int tableDrop(string tableName);
-
-    //    int indexCreate(string indexName);
-    //    int indexDrop(string indexName);
 
 		int recordInsert(string tableName, vector<string>* record);
         

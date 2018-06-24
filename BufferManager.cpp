@@ -70,7 +70,8 @@ fileNode *Buffer::getFile(string fileName)
 
 blockNode *Buffer::getBlock(string fileName, int position)
 {
-	fileNode *file = getFile(fileName);
+    string tmp = fileName;
+	fileNode *file = getFile(tmp);
 	blockNode *ret = NULL;
 	for (blockNode *tempBlock = file->blockList; tempBlock; tempBlock = tempBlock->next)
 	{

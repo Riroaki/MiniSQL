@@ -10,6 +10,7 @@
 #include <vector>
 #include <string.h>
 #include "Interpreter.h"
+Buffer *global_buffer;
 using namespace std;
 
 int main() {

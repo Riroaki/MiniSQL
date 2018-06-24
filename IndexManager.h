@@ -3,6 +3,7 @@
 #include <string>
 
 using namespace std;
+extern Buffer* global_buffer;
 
 struct Index
 {

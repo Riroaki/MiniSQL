@@ -4,15 +4,6 @@ using namespace std;
 
 
 
-OffsetType createNewBlock(string s)
-{
-	Buffer bf;
-	//return bf.Create_Node();
-	return bf.createNewBlock(s);
-}
-
-
-
 void ParseNode(char * BlockContent, Node<int> & TreeNode)
 {
 	data_trans temp;

@@ -4,7 +4,7 @@
 # include <string>
 # include <cstdio>
 # include "BlockNode.h"
-# define BLOCK_LEN			64	
+# define BLOCK_LEN			4096
 # define MAX_BLOCK			400
 
 using namespace std;

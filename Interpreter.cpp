@@ -22,6 +22,15 @@ void Interpreter::lower(string& str) {
         str[i] = (str[i] >= 'A' && str[i] <= 'Z')? str[i] + 'a' - 'A' : str[i];
 }
 
+// clear the space in the string
+void Interpreter::clearSpace(string& str) {
+    string result;
+    for(int i=0;i<str.length();i++)
+        if(str[i] != ' ')
+            result += str[i];
+    str = result;
+}
+
 
 // split the input with separator
 vector<string> Interpreter::split(string str, char separator) {
@@ -326,6 +335,10 @@ int Interpreter::exec(vector<string> input) {
                     cout<<"Syntax error: invalid parenthese format detected."<<endl;
                 else {
                     tableName = subclause.substr(0, leftPar);
+                    
+                    // clear the spaces.
+                    clearSpace(tableName);
+                    
                     if(!api.checkLegal(tableName))
                         cout<<"Fail to create table because of illegal characters in \""<<tableName<<"\"."<<endl;
                     else {
@@ -552,6 +565,7 @@ int Interpreter::exec(vector<string> input) {
             cout<<"Syntax error: table name is missing."<<endl;
         else {
             tableName = query[2];
+            clearSpace(tableName);
             if(wordCount == 3 || query[3].compare("values"))
                 cout<<"Syntax error: insert query requires \"values\"."<<endl;
             else if(wordCount == 4)

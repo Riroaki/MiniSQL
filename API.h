@@ -18,7 +18,7 @@
 #include "condition.h"
 
 using namespace std;
-
+extern Buffer* global_buffer;
 
 class API {
 private:
@@ -41,6 +41,11 @@ private:
 	}
 	
 public:
+    
+    // Initialize the API and the buffer.
+    API(){global_buffer = new Buffer();}
+    ~API(){delete global_buffer;}
+    
     // The executors:   
     // TODO:
     // Excecute the select operation, returning the results in a 2-d vector.
@@ -59,7 +64,7 @@ public:
 	//ok
     bool dropIndex(string indexName) //ok
     {
-		bool i = im.DeleteIndex(indexName);
+		bool i = im.DeleteIndex(indexName+"_index.db");
 		bool j = cm.dropIndex(indexName);
 		return i && j;
 	}

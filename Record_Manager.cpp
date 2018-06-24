@@ -34,7 +34,7 @@ int RecordManager::tableCreate(string tableName)
 int RecordManager::tableDrop(string tableName)
 {
     string tableFileName = tableFileNameGet(tableName);
-    bm.deleteFileNode(tableFileName.c_str());
+    global_buffer->deleteFileNode(tableFileName.c_str());
     if (remove(tableFileName.c_str()))
     {
         return 0;
@@ -69,7 +69,7 @@ int RecordManager::tableDrop(string tableName)
 // int RecordManager::indexDrop(string indexName)
 // {
 //     string indexFileName = indexFileNameGet(indexName);
-//     bm.deleteFileNode(indexFileName.c_str());
+//     global_buffer->deleteFileNode(indexFileName.c_str());
 //     if (remove(indexFileName.c_str()))
 //     {
 //         return 0;
@@ -87,8 +87,8 @@ int RecordManager::tableDrop(string tableName)
  */
 int RecordManager::recordInsert(string tableName, vector<string>* record)
 {
- //   fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-    blockNode *btmp = bm.getHeadBlock(tableName);
+ //   fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+    blockNode *btmp = global_buffer->getHeadBlock(tableName);
 //	cout << "Get HeadNode" << endl;
     while (true)
     {
@@ -104,10 +104,10 @@ int RecordManager::recordInsert(string tableName, vector<string>* record)
 			return -1;
 		}
 
-		int numm = bm.getUsedSize(btmp);
+		int numm = global_buffer->getUsedSize(btmp);
 		cout << "Block No." << btmp->offsetNum << " has used " << numm << " before insert." << endl;
 
-        if (BLOCK_LEN-bm.getUsedSize(btmp) >=RECORD_SIZE+2)
+        if (BLOCK_LEN-global_buffer->getUsedSize(btmp) >=RECORD_SIZE+2)
         {   
             while(i<=(*record)[0].size())
             {
@@ -130,21 +130,21 @@ int RecordManager::recordInsert(string tableName, vector<string>* record)
 //			memset(insertrecord + RECORD_SIZE, '\0', 1);
 			result = insertrecord;
 //			cout << insertrecord << endl;
-			content = strncat(bm.getContent(btmp), result, RECORD_SIZE);
+			content = strncat(global_buffer->getContent(btmp), result, RECORD_SIZE);
 //			cout << content << endl;
-            bm.updateBlock(tableName, content, btmp->offsetNum, RECORD_SIZE);
+            global_buffer->updateBlock(tableName, content, btmp->offsetNum, RECORD_SIZE);
 
-//            char *now = bm.getContent(btmp);
-            bm.getContent(btmp);
+//            char *now = global_buffer->getContent(btmp);
+            global_buffer->getContent(btmp);
 //			cout << "buffer" << endl;
 //			cout << now << endl;
-			int used = bm.getUsedSize(btmp);
+			int used = global_buffer->getUsedSize(btmp);
 			cout << "Block No." << btmp->offsetNum << " has used " << used<<" after insert." << endl;
             return btmp->offsetNum;
         }
         else
         {
-            btmp = bm.getNextBlock(tableName, btmp);
+            btmp = global_buffer->getNextBlock(tableName, btmp);
         }
     }
     
@@ -161,13 +161,13 @@ int RecordManager::recordInsert(string tableName, vector<string>* record)
  */
 int RecordManager::recordAllShow(string tableName, vector<Condition>* conditionVector)
 {
-//    fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-    blockNode *btmp = bm.getHeadBlock(tableName);
+//    fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+    blockNode *btmp = global_buffer->getHeadBlock(tableName);
     int count = 0;
-//    int numm = bm.getUsedSize(btmp);
+//    int numm = global_buffer->getUsedSize(btmp);
      while (true)
     {
-        if (bm.getUsedSize(btmp) == 0)
+        if (global_buffer->getUsedSize(btmp) == 0)
         {
 			return count;
         }
@@ -175,7 +175,7 @@ int RecordManager::recordAllShow(string tableName, vector<Condition>* conditionV
         {
             int recordBlockNum = recordBlockShow(tableName, conditionVector, btmp);
             count += recordBlockNum;
-            btmp = bm.getNextBlock(tableName, btmp);
+            btmp = global_buffer->getNextBlock(tableName, btmp);
         }
     }
     
@@ -193,8 +193,8 @@ int RecordManager::recordAllShow(string tableName, vector<Condition>* conditionV
  */
 int RecordManager::recordBlockShow(string tableName, vector<Condition>* conditionVector, int blockOffset)
 {
-//    fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-    blockNode* block = bm.getBlockByOffset(tableName, blockOffset);
+//    fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+    blockNode* block = global_buffer->getBlockByOffset(tableName, blockOffset);
     if (block == NULL)
     {
         return -1;
@@ -222,17 +222,17 @@ int RecordManager::recordBlockShow(string tableName, vector<Condition>* conditio
     {
         return -1;
     }
-//    int numm=bm.getUsedSize(block);
+//    int numm=global_buffer->getUsedSize(block);
     int count = 0;
     
-    char* recordBegin = bm.getContent(block);
+    char* recordBegin = global_buffer->getContent(block);
 //    vector<Attribute> attributeVector;
     
     int recordSize = RECORD_SIZE;
 
 //    api->attributeGet(tableName, &attributeVector);
-    char* blockBegin = bm.getContent(block);
-    size_t usingSize = bm.getUsedSize(block);
+    char* blockBegin = global_buffer->getContent(block);
+    size_t usingSize = global_buffer->getUsedSize(block);
     
     while (recordBegin - blockBegin  < usingSize)
     {
@@ -260,8 +260,8 @@ int RecordManager::recordBlockShow(string tableName, vector<Condition>* conditio
  */
 int RecordManager::recordAllFind(string tableName, vector<Condition>* conditionVector)
 {
-//    fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-    blockNode *btmp = bm.getHeadBlock(tableName);
+//    fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+    blockNode *btmp = global_buffer->getHeadBlock(tableName);
     int count = 0;
     while (true)
     {
@@ -273,7 +273,7 @@ int RecordManager::recordAllFind(string tableName, vector<Condition>* conditionV
         {
             int recordBlockNum = recordBlockFind(tableName, conditionVector, btmp);
             count += recordBlockNum;
-            btmp = bm.getNextBlock(tableName, btmp);
+            btmp = global_buffer->getNextBlock(tableName, btmp);
         }
     }
     
@@ -297,13 +297,13 @@ int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditio
     }
     int count = 0;
     
-    char* recordBegin = bm.getContent(block);
+    char* recordBegin = global_buffer->getContent(block);
 //    vector<Attribute> attributeVector;
     int recordSize = RECORD_SIZE;
     
 //    api->attributeGet(tableName, &attributeVector);
     
-    while (recordBegin - bm.getContent(block)  < bm.getUsedSize(block))
+    while (recordBegin - global_buffer->getContent(block)  < global_buffer->getUsedSize(block))
     {
         //if the recordBegin point to a record
         
@@ -328,13 +328,13 @@ int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditio
  */
 int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditionVector)
 {
-    //fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-    blockNode *btmp = bm.getHeadBlock(tableName);
+    //fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+    blockNode *btmp = global_buffer->getHeadBlock(tableName);
 
     int count = 0;
     while (true)
     {
-        if (bm.getUsedSize(btmp)==0)
+        if (global_buffer->getUsedSize(btmp)==0)
         {
             return count;
         }
@@ -342,7 +342,7 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
         {
             int recordBlockNum = recordBlockDelete(tableName, conditionVector, btmp);
             count += recordBlockNum;
-            btmp = bm.getNextBlock(tableName, btmp);
+            btmp = global_buffer->getNextBlock(tableName, btmp);
         }
     }
     
@@ -359,8 +359,8 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
  */
 int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* conditionVector, int blockOffset)
 {
-//    fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-    blockNode* block = bm.getBlockByOffset(tableName, blockOffset);
+//    fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+    blockNode* block = global_buffer->getBlockByOffset(tableName, blockOffset);
     if (block == NULL)
     {
         return -1;
@@ -383,19 +383,19 @@ int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* condi
 {
 	int recordNum = 0;
     //if block is null, return -1
-    if (bm.getUsedSize(block)==0)
+    if (global_buffer->getUsedSize(block)==0)
     {
         return -1;
     }
     int count = 0;
     
-    char* recordBegin = bm.getContent(block);
+    char* recordBegin = global_buffer->getContent(block);
 //    vector<Attribute> attributeVector;
     int recordSize = RECORD_SIZE;
     
 //    api->attributeGet(tableName, &attributeVector);
     
-    while (recordBegin - bm.getContent(block) < bm.getUsedSize(block))
+    while (recordBegin - global_buffer->getContent(block) < global_buffer->getUsedSize(block))
     {
         //if the recordBegin point to a record
         
@@ -408,17 +408,17 @@ int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* condi
 //            char *origin = recordBegin;
             char *content;
 			int num = BLOCK_LEN - RECORD_SIZE;
-			int used = bm.getUsedSize(block);
+			int used = global_buffer->getUsedSize(block);
 			int rest = BLOCK_LEN - (recordNum+1)*(RECORD_SIZE);
 			memcpy(recordBegin, recordBegin + RECORD_SIZE,rest);
             memset(recordBegin+num,0, RECORD_SIZE);
-            content=bm.getContent(block);
+            content=global_buffer->getContent(block);
 
 			cout << "Block No." << block->offsetNum << " has used " << used <<" before update."<< endl;
 
-            bm.updateBlock(tableName, content, block->offsetNum, -recordSize);
+            global_buffer->updateBlock(tableName, content, block->offsetNum, -recordSize);
 			
-			used = bm.getUsedSize(block);
+			used = global_buffer->getUsedSize(block);
 			cout << "Block No." << block->offsetNum << " has used " << used<<" after update."<< endl;
         }
         else
@@ -440,8 +440,8 @@ int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* condi
  */
 // int RecordManager::indexRecordAllAlreadyInsert(string tableName,string indexName)
 // {
-//     fileNode *ftmp = bm.getFile(tableFileNameGet(tableName).c_str());
-//     blockNode *btmp = bm.getBlockHead(ftmp);
+//     fileNode *ftmp = global_buffer->getFile(tableFileNameGet(tableName).c_str());
+//     blockNode *btmp = global_buffer->getBlockHead(ftmp);
 //     int count = 0;
 //     while (true)
 //     {
@@ -459,7 +459,7 @@ int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* condi
 //         {
 //             int recordBlockNum = indexRecordBlockAlreadyInsert(tableName, indexName, btmp);
 //             count += recordBlockNum;
-//             btmp = bm.getNextBlock(ftmp, btmp);
+//             btmp = global_buffer->getNextBlock(ftmp, btmp);
 //         }
 //     }
     
@@ -484,7 +484,7 @@ int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* condi
 //     }
 //     int count = 0;
     
-//     char* recordBegin = bm.getContent(*block);
+//     char* recordBegin = global_buffer->getContent(*block);
 // //    vector<Attribute> attributeVector;
 //     int recordSize = RECORD_SIZE;
     
@@ -494,7 +494,7 @@ int RecordManager::recordBlockDelete(string tableName,  vector<Condition>* condi
 //     int typeSize;
 //     char * contentBegin;
     
-//     while (recordBegin - bm.getContent(*block)  < bm.getUsedSize(*block))
+//     while (recordBegin - global_buffer->getContent(*block)  < global_buffer->getUsedSize(*block))
 //     {
 //         contentBegin = recordBegin;
 //         //if the recordBegin point to a record

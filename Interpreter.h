@@ -18,6 +18,7 @@ using namespace std;
 class Interpreter {
 private:
     void lower(string&);
+    void clearSpace(string&);
     vector<string> split(string str, char separator);
     vector<string> adjustQuery(vector<string> input);
     API api;

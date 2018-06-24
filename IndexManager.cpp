@@ -65,7 +65,7 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int D
 	if(KeyType == INT_TYPE)
 	{
 		BPlusTree<int> BPT(IndexName, KeySize, KeyType, Degree);
-		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
+		BPT.LeafHead = BPT.root = global_buffer->createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<int> node(KeySize);
 		node.Self = BPT.root;
@@ -76,7 +76,7 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int D
 	else if(KeyType == FLOAT_TYPE)
 	{
 		BPlusTree<float> BPT(IndexName, KeySize, KeyType, Degree);
-		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
+		BPT.LeafHead = BPT.root = global_buffer->createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<float> node(KeySize);
 		node.Self = BPT.root;
@@ -87,7 +87,7 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int D
 	else if(KeyType == STRING_TYPE)
 	{
 		BPlusTree<string> BPT(IndexName, KeySize, KeyType, Degree);
-		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
+		BPT.LeafHead = BPT.root = global_buffer->createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<string> node(KeySize);
 		node.Self = BPT.root;
