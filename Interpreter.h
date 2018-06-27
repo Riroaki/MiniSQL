@@ -13,6 +13,8 @@
 #include <string>
 #include <iostream>
 #include "API.h"
+#include <stdexcept>
+#include <time.h>
 using namespace std;
 
 class Interpreter {

@@ -10,7 +10,7 @@
 #include <string>
 #include "BufferManager.h"
 
-using namespace std;
+;using namespace std;
 
 typedef int OffsetType;
 extern Buffer* global_buffer;
@@ -241,7 +241,7 @@ int Node<KeyType>::Insert_Into_Node(KeyType Key, OffsetType DataOffset)
 		int exist = Search_In_Node_exact(Key);
 		if(exist >= 0)
 		{
-			cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
+//            cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
 			return -1;
 		}
 		
@@ -275,7 +275,7 @@ int Node<KeyType>::Insert_Into_Node(KeyType Key)
 		int exist = Search_In_Node_exact(Key);
 		if (exist >= 0)
 		{
-			cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
+//            cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
 			return -1;
 		}
 
@@ -394,7 +394,7 @@ bool BPlusTree<KeyType>::Insert(KeyType Key, OffsetType DataOffset)
 	index = TargetLeaf.Search_In_Node_exact(Key);
 	if (index > 0)
 	{
-		cout << "Error:in insert key to index: the duplicated key!" << endl;
+//        cout << "Error:in insert key to index: the duplicated key!" << endl;
 		return false;
 	}
 	else
@@ -462,7 +462,11 @@ void BPlusTree<KeyType>::Parse_Index(char * BlockContent)
 	data_trans temp;
 	char temp_key[100];
 	int UsingSize = 0;
-
+    
+    memcpy(temp_key, BlockContent + UsingSize, 100);
+    BPlusTree_name = temp_key;
+    UsingSize += 100;
+    
 	memcpy(temp.character, BlockContent + UsingSize, sizeof(OffsetType));
 	UsingSize += sizeof(OffsetType);
 	root = temp.integer;
@@ -487,9 +491,7 @@ void BPlusTree<KeyType>::Parse_Index(char * BlockContent)
 	UsingSize += sizeof(int);
 	level = temp.integer;
 
-	memcpy(temp_key, BlockContent + UsingSize, 100);
-		BPlusTree_name = temp_key;
-	UsingSize += 100;
+	
 
 }
 
@@ -499,7 +501,11 @@ void BPlusTree<KeyType>::Inver_ParseIndex(char * BlockContent)
 	data_trans temp;
 	char temp_key[100];
 	int UsingSize = 0;
-
+    
+    strcpy(temp_key, BPlusTree_name.c_str());
+    memcpy(BlockContent + UsingSize, temp_key, 100);
+    UsingSize += 100;
+    
 	temp.integer = root;
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
 	UsingSize += sizeof(OffsetType);
@@ -524,9 +530,7 @@ void BPlusTree<KeyType>::Inver_ParseIndex(char * BlockContent)
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(int));
 	UsingSize += sizeof(int);
 
-	strcpy(temp_key, BPlusTree_name.c_str());
-	memcpy(BlockContent + UsingSize, temp_key, 100);
-	UsingSize += 100;
+	
 }
 
 
@@ -620,7 +624,7 @@ bool Node<KeyType>::Delete_from_Node(KeyType Key)
 	}
 	else
 	{
-		cout << "The key is not in the list." << endl;
+//        cout << "The key is not in the list." << endl;
 		return false;
 	}
 }
@@ -673,7 +677,7 @@ bool Node<KeyType>::RemoveAt(IndexType index)//移除第index个值右侧
 {
 	if (index > key_num)
 	{
-		cout << " Error, index is more than numbers of key";
+//        cout << " Error, index is more than numbers of key";
 		return false;
 	}
 	else
@@ -705,7 +709,7 @@ bool BPlusTree<KeyType>::Delete(KeyType Key)
 	bool IsFind;
 	IsFind = Search(Key, searchNodeOffset);
     if (false == IsFind) {
-        cout << "Error, there is no Key in the tree" << endl;
+//        cout << "Error, there is no Key in the tree" << endl;
         return false;
     }
 	else
@@ -1343,34 +1347,3 @@ void BPlusTree<KeyType>::Bm_Delete_Node(Node<KeyType> &node)
 {
  	global_buffer->Delete_Block(BPlusTree_name, node.Self);
 }
-/*
-template <class KeyType>
-void BPlusTree<KeyType>::UpdateNode(Node<KeyType> & node, OffsetType offset)
-{
-	char UpdateContent[4096];
-	Buffer bf;
-
-	Inver_ParseNode(UpdateContent, node);
-	 Update_Node(offset, UpdateContent);
-}
-
-template <class KeyType>
-void BPlusTree<KeyType>::GetNode(Node<KeyType> & node, OffsetType offset)
-{
-	char * BlockContent;
-	Buffer bf;
-
-	BlockContent =  Get_Node(offset);
-	ParseNode(BlockContent, node);
-}
-
-
-template <class KeyType>
-void BPlusTree<KeyType>::Bm_Delete_Node(Node<KeyType> &node)
-{
-	Buffer bf;
-
-	 Delete_Node(node.Self);
-}
-
-*/

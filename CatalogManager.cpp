@@ -10,46 +10,34 @@ using namespace std;
 
 bool CatalogManager::checkType(string value, string type)
 {
-	int point = 0;
-	string attribute = "int";
-	if (type == attribute) {
-		for (int i = 0; i < value.length(); i++) {
-			if (value[i] < '0' || value[i] > '9') {
-				return false;
-			}
-		}
-	}
-	else {
-		attribute = "float";
-		if (type == attribute) {
-			for (int i = 0; i < value.length(); i++) {
-				if (value[i] < '0' || value[i] > '9') {
-					if (value[i] == '.') {
-						point++;
-					}
-					else {
-						return false;
-					}
-				}
-				if (point > 1) {
-					return false;
-				}
-			}
-		}
-		else {
-			if (value[0] != '\'' || value[value.length() - 1] != '\'') {
-				return false;
-			}
-			string str_length = type.substr(4);
-			stringstream str_str;
-			str_str << str_length;
-			int length;
-			str_str >> length;
-			if (length < value.length() - 2) {
-				return false;
-			}
-
-		}
+    if(type == "int") {// int
+        int num;
+        try {
+            num = stoi(value);
+        } catch (invalid_argument&) {
+            return false;
+        } catch (out_of_range&) {
+            cout<<"Out of range error!"<<endl;
+            return false;
+        } catch (...) {
+            return false;
+        }
+    } else if(type == "float") {// float
+        float num;
+        try {
+            num = stof(value);
+        } catch (invalid_argument&) {
+            return false;
+        } catch (out_of_range&) {
+            cout<<"Out of range error!"<<endl;
+            return false;
+        } catch (...) {
+            return false;
+        }
+    } else {// char(xx)
+        int trueLen = (int)value.length();
+        int len = stoi(type.substr(4));
+        return value[0] == '\'' && value[trueLen-1] == '\'' && trueLen-2 <= len;
 	}
 	return true;
 }
@@ -57,9 +45,7 @@ bool CatalogManager::checkType(string value, string type)
 bool CatalogManager::createTable(string tableName, vector<string> attributeScheme, vector<string> attributeName, string primaryKey, vector<int>unique)
 {
 	ofstream catalog;
-	string path = "db\\";
-	path = path + tableName;
-	path = path + ".db";
+	string path = tableName + ".db";
 	if (this->checkFile(path)) {
 		cout << "The table has been created!" << endl;
 		return false;
@@ -115,14 +101,14 @@ bool CatalogManager::createTable(string tableName, vector<string> attributeSchem
 
 bool CatalogManager::dropTable(string tableName) {
 
-	string path = "db\\";
-	path = path + tableName;
-	path = path + ".db";
+	//string path = "db\\";
+	//path = path + tableName;
+	string path = tableName + ".db";
 	if (this->checkFile(path)) {
 		remove(path.c_str());
 	}
 	else {
-		cout << "No such a table!" << endl;
+//        cout << "No such a table!" << endl;
 		return false;
 	}
 	path = getFilePath(tableName);
@@ -130,7 +116,7 @@ bool CatalogManager::dropTable(string tableName) {
 		remove(path.c_str());
 	}
 	else {
-		cout << "No such a table!" << endl;
+//        cout << "No such a table!" << endl;
 		return false;
 	}
 	return true;
@@ -141,7 +127,7 @@ vector<string> CatalogManager::getAttributeScheme(string tableName)
 	vector <string> attributeScheme;
 	string path = getFilePath(tableName);
 	if (!this->checkFile(path)) {
-		cout << "No such a table!" << endl;
+//        cout << "No such a table!" << endl;
 		return attributeScheme;
 	}
 	ifstream catalog(path.c_str());
@@ -165,7 +151,7 @@ vector<string> CatalogManager::getAttributeName(string tableName)
 	vector <string> attributeName;
 	string path = getFilePath(tableName);
 	if (!this->checkFile(path)) {
-		cout << "No such a table!" << endl;
+//        cout << "No such a table!" << endl;
 		return attributeName;
 	}
 	ifstream catalog(path.c_str());
@@ -210,7 +196,7 @@ vector<int> CatalogManager::getUnique(string tableName)
 	vector<int> unique;//注：这里的unique与create table里的unique向量含义不相同。
 	string path = getFilePath(tableName);
 	if (!this->checkFile(path)) {
-		cout << "No such a table!" << endl;
+//        cout << "No such a table!" << endl;
 		return unique;
 	}
 	ifstream catalog(path.c_str());
@@ -239,7 +225,7 @@ int CatalogManager::getPrimaryKey(string tableName)
 {
 	string path = getFilePath(tableName);
 	if (!this->checkFile(path)) {
-		cout << "No such a table!" << endl;
+//        cout << "No such a table!" << endl;
 		return 0;
 	}
 	ifstream catalog(path.c_str());
@@ -269,53 +255,47 @@ int CatalogManager::getAttributePosition(string tableName, string name)
 	return -1;
 }
 
-bool CatalogManager::createIndex(string tableName, string attributeName, string indexName) 
+bool CatalogManager::createIndex(string tableName, string attributeName, string indexName)
 {
-	if (checkIndex(indexName)) {
-		return false;
-	}
-	fstream catalog;
-	string path = getFilePath(tableName);
-	if (!this->checkFile(path)) {
-		cout << "No such a table!" << endl;
-		return false;
-	}
+    if (checkIndex(indexName)) {
+        return false;
+    }
+    fstream catalog;
+    string path = getFilePath(tableName);
+    if (!this->checkFile(path)) {
+//        cout << "No such a table!" << endl;
+        return false;
+    }
     path = indexName+"_index.db";
-	ofstream index;
-	index.open(path);
-    catalog.close();
-	int i = getAttributePosition(tableName, attributeName);
+    ofstream index;
+    index.open(path);
+    index.close();
 
-	catalog.open(path, ios::in | ios::out);
-	catalog.seekp(ios::beg);
-	catalog.seekp(i * (ATTR_SCHEME_LENGTH + ATTR_NAME_LENGTH + PRIMARY_KEY_LENGTH + UNIQUE_LENGTH + INDEX_LENGTH) + ATTR_SCHEME_LENGTH + ATTR_NAME_LENGTH + PRIMARY_KEY_LENGTH + UNIQUE_LENGTH, ios::cur);
-	catalog << "1";
-	catalog.close();
-	
-	//ofstream index;
-	path = "db\\index.db";
-	if (!this->checkFile(path)) {
-		index.open(path.c_str());
-		index.close();
-	}
-	index.open(path, ios::app);
-
-	while (tableName.length() < TABLE_NAME_LENGTH) {
-		tableName += " ";
-	}
-	index << tableName;
-	while (attributeName.length() < ATTR_NAME_LENGTH) {
-		attributeName += " ";
-	}
-	index << attributeName;
-	while (indexName.length() < INDEX_NAME_LENGTH) {
-		indexName += " ";
-	}
-
-	index << indexName;
-	index.close();
-	
-	return true;
+    path = "db\\index.db";
+    if (!this->checkFile(path)) {
+        index.open(path.c_str());
+        index.close();
+    }
+    
+    index.open(path, ios::app);
+    
+    
+    while (tableName.length() < TABLE_NAME_LENGTH) {
+        tableName += " ";
+    }
+    index << tableName;
+    while (attributeName.length() < ATTR_NAME_LENGTH) {
+        attributeName += " ";
+    }
+    index << attributeName;
+    while (indexName.length() < INDEX_NAME_LENGTH) {
+        indexName += " ";
+    }
+    
+    index << indexName;
+    index.close();
+    
+    return true;
 }
 
 bool CatalogManager::dropIndex(string indexName)
@@ -323,6 +303,9 @@ bool CatalogManager::dropIndex(string indexName)
 	fstream index("db\\index.db");
 	index.seekg(ios::beg);
 	int i = 0;
+    //remove(indexName+"_index.db");
+    string indexFileName = indexName+"_index.db";
+    remove(indexFileName.c_str());
 	string thisIndexName;
 	while (!index.eof()) {
 		index.seekg(ios::beg);
@@ -414,4 +397,60 @@ bool CatalogManager::checkIndex(string indexName)
 		i++;
 	}
 	return false;
+}
+
+vector <string> CatalogManager::getAllIndex()
+{
+    ifstream index("db\\index.db");
+    //string thisTableName;
+    vector <string> allIndex;
+    string indexName;
+    int i = 0;
+    while (index.peek() != EOF) {
+        index.seekg(ios::beg);
+        index.seekg(i * (TABLE_NAME_LENGTH + ATTR_NAME_LENGTH + INDEX_NAME_LENGTH) + TABLE_NAME_LENGTH + ATTR_NAME_LENGTH, ios::cur);
+        
+        if (index.peek() == ' ') {
+            i++;
+            continue;
+        }
+        index.seekg(ios::beg);
+        index.seekg(i * (TABLE_NAME_LENGTH + ATTR_NAME_LENGTH + INDEX_NAME_LENGTH) + TABLE_NAME_LENGTH + ATTR_NAME_LENGTH, ios::cur);
+        index >> indexName;
+        if (index.eof()) {
+            break;
+        }
+        allIndex.push_back(indexName+"_index.db");
+        
+        i++;
+    }
+    return  allIndex;
+}
+
+vector <string> CatalogManager::getAllIndexType()
+{
+    ifstream index("db\\index.db");
+    //string thisTableName;
+    vector <string> allIndexType;
+    string indexNameType;
+    int i = 0;
+    while (index.peek() != EOF) {
+        index.seekg(ios::beg);
+        index.seekg(i * (TABLE_NAME_LENGTH + ATTR_NAME_LENGTH + INDEX_NAME_LENGTH) + TABLE_NAME_LENGTH, ios::cur);
+        
+        if (index.peek() == ' ') {
+            i++;
+            continue;
+        }
+        index.seekg(ios::beg);
+        index.seekg(i * (TABLE_NAME_LENGTH + ATTR_NAME_LENGTH + INDEX_NAME_LENGTH) + TABLE_NAME_LENGTH, ios::cur);
+        index >> indexNameType;
+        if (index.eof()) {
+            break;
+        }
+        allIndexType.push_back(indexNameType);
+        
+        i++;
+    }
+    return  allIndexType;
 }

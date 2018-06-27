@@ -11,6 +11,10 @@ void ParseNode(char * BlockContent, Node<int> & TreeNode)
 	int i, j;
 	int UsingSize = 0;
 
+    memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
+    UsingSize += sizeof(int);
+    TreeNode.key_size = temp.integer;
+    
 	memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
 	UsingSize += sizeof(int);
 	TreeNode.key_num = temp.integer;
@@ -35,9 +39,7 @@ void ParseNode(char * BlockContent, Node<int> & TreeNode)
 	UsingSize += sizeof(OffsetType);
 	TreeNode.PrevNode = temp.integer;
 
-	memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
-	UsingSize += sizeof(int);
-	TreeNode.key_size = temp.integer;
+	
 
 	j = 0;
 	if (!TreeNode.IsLeaf)
@@ -74,7 +76,10 @@ void ParseNode(char * BlockContent, Node<float> & TreeNode)
 	string temp_key;
 	int i, j;
 	int UsingSize = 0;
-
+    memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
+    UsingSize += sizeof(int);
+    TreeNode.key_size = temp.integer;
+    
 	memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
 	UsingSize += sizeof(int);
 	TreeNode.key_num = temp.integer;
@@ -99,9 +104,7 @@ void ParseNode(char * BlockContent, Node<float> & TreeNode)
 	UsingSize += sizeof(OffsetType);
 	TreeNode.PrevNode = temp.integer;
 
-	memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
-	UsingSize += sizeof(int);
-	TreeNode.key_size = temp.integer;
+
 
 	j = 0;
 	if (!TreeNode.IsLeaf)
@@ -135,6 +138,10 @@ void ParseNode(char * BlockContent, Node<string> & TreeNode)
 	int i, j;
 	int UsingSize = 0;
 
+    memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
+    UsingSize += sizeof(int);
+    TreeNode.key_size = temp.integer;
+    
 	memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
 	UsingSize += sizeof(int);
 	TreeNode.key_num = temp.integer;
@@ -159,9 +166,7 @@ void ParseNode(char * BlockContent, Node<string> & TreeNode)
 	UsingSize += sizeof(OffsetType);
 	TreeNode.PrevNode = temp.integer;
 
-	memcpy(temp.character, BlockContent + UsingSize, sizeof(int));
-	UsingSize += sizeof(int);
-	TreeNode.key_size = temp.integer;
+	
 
 	j = 0;
 	if (!TreeNode.IsLeaf)
@@ -196,6 +201,10 @@ void Inver_ParseNode(char * BlockContent, Node<int> & TreeNode)
 	int i, j;
 	int UsingSize = 0;
 
+    temp.integer = TreeNode.key_size;
+    memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
+    UsingSize += sizeof(OffsetType);
+
 	temp.integer = TreeNode.key_num;
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(int));
 	UsingSize += sizeof(int);
@@ -220,10 +229,7 @@ void Inver_ParseNode(char * BlockContent, Node<int> & TreeNode)
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
 	UsingSize += sizeof(OffsetType);
 
-	temp.integer = TreeNode.key_size;
-	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
-	UsingSize += sizeof(OffsetType);
-
+	
 	j = 0;
 	if (!TreeNode.IsLeaf)
 	{
@@ -249,6 +255,10 @@ void Inver_ParseNode(char * BlockContent, Node<float> & TreeNode)
 	int i, j;
 	int UsingSize = 0;
 
+    temp.integer = TreeNode.key_size;
+    memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
+    UsingSize += sizeof(OffsetType);
+    
 	temp.integer = TreeNode.key_num;
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(int));
 	UsingSize += sizeof(int);
@@ -273,9 +283,7 @@ void Inver_ParseNode(char * BlockContent, Node<float> & TreeNode)
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
 	UsingSize += sizeof(OffsetType);
 
-	temp.integer = TreeNode.key_size;
-	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
-	UsingSize += sizeof(OffsetType);
+	
 
 	j = 0;
 	if (!TreeNode.IsLeaf)
@@ -302,7 +310,11 @@ void Inver_ParseNode(char * BlockContent, Node<string> & TreeNode)
 	char temp_key[256];
 	int i, j;
 	int UsingSize = 0;
-
+    
+    temp.integer = TreeNode.key_size;
+    memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
+    UsingSize += sizeof(OffsetType);
+    
 	temp.integer = TreeNode.key_num;
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(int));
 	UsingSize += sizeof(int);
@@ -327,9 +339,6 @@ void Inver_ParseNode(char * BlockContent, Node<string> & TreeNode)
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
 	UsingSize += sizeof(OffsetType);
 
-	temp.integer = TreeNode.key_size;
-	memcpy(BlockContent + UsingSize, temp.character, sizeof(OffsetType));
-	UsingSize += sizeof(OffsetType);
 
 	j = 0;
 	if (!TreeNode.IsLeaf)

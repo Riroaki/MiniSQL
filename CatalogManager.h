@@ -2,12 +2,12 @@
 #define CATALOGMANAGER_H
 
 #define ATTR_SCHEME_LENGTH 8
-#define ATTR_NAME_LENGTH 11
+#define ATTR_NAME_LENGTH 21
 #define PRIMARY_KEY_LENGTH 1
 #define UNIQUE_LENGTH 1
 #define INDEX_LENGTH 1
 #define TABLE_NAME_LENGTH 21
-#define INDEX_NAME_LENGTH 11
+#define INDEX_NAME_LENGTH 21
 
 #include <string>
 #include <vector>
@@ -70,5 +70,9 @@ public:
 	string getIndexName(string tableName, string attributeName);
 	//判断该索引是否存在，如果该索引名已经存在，则返回true，否则返回false
 	bool checkIndex(string indexName);
+    //获得所有的的索引名
+    vector <string> getAllIndex();
+    //types.
+    vector <string> getAllIndexType();
 };
 #endif

@@ -1,10 +1,9 @@
 #pragma once
-#pragma once
 # include <iostream>
 # include <string>
 # include <cstdio>
 # include "BlockNode.h"
-# define BLOCK_LEN			4096
+# define BLOCK_LEN			4096	
 # define MAX_BLOCK			400
 
 using namespace std;
@@ -12,18 +11,18 @@ using namespace std;
 class Buffer
 {
 private:
-	fileNode * fileList;
+	fileNode *fileList;
 	blockNode blockPool[MAX_BLOCK];
 	int curBlockNum;
 	int curFileNum;
-	fileNode *getFile(string fileName);
-	blockNode *getBlock(string fileName, int position);
 	void writeToDisk(blockNode *block);
 	void clearBlockNode(blockNode *block);
 	void clearFileNode(fileNode *file);
 	void writeAllToDisk();
 public:
 	Buffer();
+	fileNode *getFile(string fileName);
+	blockNode *getBlock(string fileName, int position);
 	void deleteFileNode(string fileName);//delete file node when the file is deleted
 	blockNode *getHeadBlock(string fileName);//get head block of the file for record
 	blockNode *getNextBlock(string fileName, blockNode *block);//get the next of the block in the file

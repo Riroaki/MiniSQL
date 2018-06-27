@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 # include "FileNode.h"
 # include <iostream>
 using namespace std;

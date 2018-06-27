@@ -43,8 +43,7 @@ private:
 public:
     
     // Initialize the API and the buffer.
-    API(){global_buffer = new Buffer();}
-    ~API(){delete global_buffer;}
+    API();
     
     // The executors:   
     // TODO:
@@ -65,6 +64,7 @@ public:
     bool dropIndex(string indexName) //ok
     {
 		bool i = im.DeleteIndex(indexName+"_index.db");
+		global_buffer->deleteFileNode(indexName + "_index.db");
 		bool j = cm.dropIndex(indexName);
 		return i && j;
 	}
@@ -84,7 +84,7 @@ public:
     // Check if the characters are legal.
 	bool checkLegal(string str);//ok
     
-    // Check if the characters makes a integer less than 255: true if okay and false if not okay.
+    // Check if the characters make a integer: true if okay and false if not okay.
     bool checkInteger(string str);//ok
     
     // Get the index of operator from {=, >, <, >=, <=, <>} or -1 if not matched.
@@ -98,7 +98,7 @@ public:
 	//ok
     bool checkTable(string tableName)
 	{
-		return cm.checkFile(tableName);
+		return cm.checkFile(tableName+".db");
 	}
     
     // Check if an index exists, return true if exist and false if not.
@@ -113,11 +113,17 @@ public:
 		return cm.judgeAttribute(tableName, valueVec);
 	}
     
-    // Get the attributes of the table with given table name.
-    vector<string> getAttributes(string tableName) //ok
+    // Get the attributes' types of the table with given table name.
+    vector<string> getAttributeTypes(string tableName) //ok
 	{
 		return cm.getAttributeScheme(tableName);
 	}
+    
+    // Get the attributes' names of the table with given table nams.
+    vector <string> getAttributeNames(string tableName)
+    {
+        return cm.getAttributeName(tableName);
+    }
     
     // Get the index of an attribute in a table, or return -1 if not found.
     int findAttribute(string tableName, string attributeName) //ok

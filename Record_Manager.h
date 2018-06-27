@@ -1,24 +1,42 @@
 #ifndef RECORD_MANAGER_H
 #define RECORD_MANAGER_H
-#include "condition.h"
+//#include "API.h"
 #include "Record_Manager.h"
 #include "BufferManager.h"
+#include "condition.h"
+//#include "Index_Manager.h"
+//#include "Interpreter.h"
+//#include "Minisql.h"
 #include <string>
 #include <vector>
 
 
 using namespace std;
+//class API;
 
 extern Buffer* global_buffer;
+
+
+class RetRecord {
+public:
+	int offsetNum;
+	vector<string> singleRecord;
+};
+
 
 class RecordManager{
     public:
         RecordManager(){}
-
+        //API *api;
+		vector<RetRecord> RecordManager::returnRecord(string tableName, vector<Condition>* conditionVector);
+		vector<RetRecord> RecordManager::recordBlockReturn(string tableName, vector<Condition>* conditionVector, blockNode* block);
 		int tableCreate(string tableName);
         int tableDrop(string tableName);
 
-		int recordInsert(string tableName, vector<string>* record);
+    //    int indexCreate(string indexName);
+    //    int indexDrop(string indexName);
+
+		int recordInsert(string tableName, vector<string> record);
         
         int recordAllShow(string tableName, vector<Condition>* conditionVector);
         int recordBlockShow(string tableName, vector<Condition>* conditionVector, int blockOffset);
@@ -43,5 +61,4 @@ class RecordManager{
         bool contentConditionFit(char* content,Condition* condition);
     //    bool contentPrint(char * content, int type);
 };
-
 #endif    

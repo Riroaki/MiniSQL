@@ -70,8 +70,7 @@ fileNode *Buffer::getFile(string fileName)
 
 blockNode *Buffer::getBlock(string fileName, int position)
 {
-    string tmp = fileName;
-	fileNode *file = getFile(tmp);
+	fileNode *file = getFile(fileName);
 	blockNode *ret = NULL;
 	for (blockNode *tempBlock = file->blockList; tempBlock; tempBlock = tempBlock->next)
 	{
@@ -131,7 +130,7 @@ blockNode *Buffer::getBlock(string fileName, int position)
 	{
 		if (fseek(fp, ret->offsetNum * BLOCK_LEN, SEEK_SET) == 0)//删除的时候需要把后面的内容copy到前面去
 		{
-			int getContentSize = (int)fread(ret->content, 1, BLOCK_LEN, fp);
+			int getContentSize = fread(ret->content, 1, BLOCK_LEN, fp);
 			if (getContentSize < 0)
 			{
 				cout << "write contents to block failed\n" << endl;
@@ -190,6 +189,7 @@ blockNode *Buffer::getBlock(string fileName, int position)
 		cout << "can not open this file\n" << endl;
 		return NULL;
 	}
+	fclose(fp);
 	return ret;
 }
 
@@ -225,7 +225,7 @@ blockNode *Buffer::getBlockByOffset(string fileName, int offset)
 	blockNode *ret = NULL;
 	if (offset == 0)
 	{
-        ret = getBlock(fileName, 0);
+		ret = getBlock(fileName, 0);
 	}
 	else
 	{
@@ -249,20 +249,24 @@ void Buffer::writeToDisk(blockNode *block)
 			if (fwrite(block->content, BLOCK_LEN, 1, fp) != 1)
 			{
 				cout << "file writing wrong\n" << endl;
+				fclose(fp);
 				return;
 			}
 		}
 		else
 		{
 			cout << "file pointer wrong\n" << endl;
+			fclose(fp);
 			return;
 		}
 	}
 	else
 	{
 		cout << "can not open the file\n" << endl;
+		fclose(fp);
 		return;
 	}
+	fclose(fp);
 }
 
 void Buffer::writeAllToDisk()
@@ -282,8 +286,10 @@ void Buffer::writeAllToDisk()
 
 void Buffer::deleteFileNode(string fileName)
 {
+	if (!fileList)
+		return;
 	fileNode *tempFile = fileList;
-	while (tempFile->next)
+	while (tempFile)
 	{
 		if (tempFile->fileName == fileName)
 		{
@@ -308,10 +314,13 @@ void Buffer::clearFileNode(fileNode *file)
 	{
 		if (tempBlock->pre)
 		{
-			delete tempBlock->pre;
+			clearBlockNode(tempBlock->pre);
+			curBlockNum--;
 		}
+		tempBlock = tempBlock->next;
 	}
-	delete tempBlock;
+	clearBlockNode(tempBlock);
+	curBlockNum--;
 	file->blockList = NULL;
 	file->fileName = "";
 	file->next = NULL;
@@ -327,11 +336,13 @@ void Buffer::updateBlock(string fileName, char *newData, int offset, int addSize
 	{
 		if (tempBlock->offsetNum == offset)
 		{
-			tempBlock->usedSize += addSize;
+			if(tempBlock->usedSize < BLOCK_LEN)
+				tempBlock->usedSize += addSize;
 			char *temp = new char[BLOCK_LEN];
 			memcpy(temp, newData, BLOCK_LEN);
 			memset(tempBlock->content, 0, BLOCK_LEN);
-			memcpy(tempBlock->content, temp, tempBlock->usedSize);
+			if (tempBlock->usedSize)
+				memcpy(tempBlock->content, temp, tempBlock->usedSize);
 			delete[] temp;
 			if (newData[0] != '\0')
 			{
@@ -352,7 +363,8 @@ void Buffer::updateBlock(string fileName, char *newData, int offset, int addSize
 		char *temp = new char[BLOCK_LEN];
 		memcpy(temp, newData, BLOCK_LEN);
 		memset(tempBlock->content, 0, BLOCK_LEN);
-		memcpy(tempBlock->content, newData, tempBlock->usedSize);
+		if (tempBlock->usedSize)
+			memcpy(tempBlock->content, temp, tempBlock->usedSize);
 		delete[] temp;
 		if (newData[0] != '\0')
 		{
